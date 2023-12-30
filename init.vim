@@ -21,6 +21,8 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.5' }
 Plug 'nvim-telescope/telescope-file-browser.nvim'
 
+Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
+
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 Plug 'numirias/semshi', { 'do': ':UpdateRemotePlugins' }
@@ -44,6 +46,8 @@ Plug 'morhetz/gruvbox'
 Plug 'daschw/leaf.nvim'
 
 Plug 'lukas-reineke/indent-blankline.nvim'
+
+Plug 'xiyaowong/transparent.nvim'
 
 call plug#end()
 
@@ -74,6 +78,8 @@ augroup TitleUpdate
   autocmd BufEnter * let &titlestring = expand("%:t") . " - Neovim"
 augroup END
 
+hi BufferTabpageFill ctermbg=black
+
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 autocmd InsertEnter * :set norelativenumber
@@ -95,7 +101,7 @@ if has("mouse")
   set mouse=a
 endif
 
-noremap <F4> :set hlsearch! hlsearch?<CR>
+noremap <silent> <F4> :set hlsearch! hlsearch?<CR>
 map ; <cmd>Telescope find_files<CR>
 map <C-t> :terminal<CR>
 
@@ -104,6 +110,14 @@ autocmd FileType rust nnoremap <F5> :w<CR>:!cargo run<CR>
 
 " map F5 to run python
 autocmd FileType py * :semshi enable
+
+" bufferline keybindings
+nnoremap <silent> <A-.> :BufferLineCycleNext<CR>
+nnoremap <silent> <A-,> :BufferLineCyclePrev<CR>
+
+nnoremap <silent> <A-'> :BufferLinePick<CR>
+
+nnoremap <silent> <A-c> :BufferLinePickClose<CR>
 
 " Discord Rich presence
 let g:presence_main_image = 'neovim'
@@ -134,7 +148,7 @@ require("leaf").setup({
     statementStyle = "bold",
     typeStyle = "NONE",
     variablebuiltinStyle = "italic",
-    transparent = false,
+    transparent = true,
     colors = {},
     overrides = {},
     theme = "auto", -- default, based on vim.o.background, alternatives: "light", "dark"
@@ -143,8 +157,6 @@ require("leaf").setup({
 
 -- setup must be called before loading
 vim.cmd("colorscheme leaf")
-
-vim.api.nvim_set_hl(0, "Normal", {guibg=NONE, ctermbg=NONE})
 
 -- setup indent indent-blankline
 require("ibl").setup()
@@ -207,6 +219,8 @@ require("telescope").setup {
 -- you need to call load_extension, somewhere after setup function:
 require("telescope").load_extension "file_browser"
 
+require("bufferline").setup{}
+
 -- Lualine setup
 require('lualine').setup{
   options = {
@@ -227,6 +241,9 @@ require('lualine').setup{
     lualine_z = {'location'}
   }
 }
+
+-- Set up transparent background
+require('transparent').clear_prefix('lualine')
 
 -- Set up nvim-cmp
 local cmp = require('cmp')
