@@ -49,6 +49,8 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 
 Plug 'xiyaowong/transparent.nvim'
 
+Plug 'startup-nvim/startup.nvim'
+
 call plug#end()
 
 set title
@@ -71,6 +73,8 @@ set expandtab
 set shiftround
 set nowrap
 set clipboard=unnamedplus
+
+let mapleader = " "
 
 " set the title of the window to the name of the file
 augroup TitleUpdate
@@ -244,6 +248,9 @@ require('lualine').setup{
 
 -- Set up transparent background
 require('transparent').clear_prefix('lualine')
+
+-- Set up startup.nvim
+require('startup').setup()
 
 -- Set up nvim-cmp
 local cmp = require('cmp')
