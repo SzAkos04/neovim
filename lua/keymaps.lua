@@ -22,6 +22,11 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 -- Replace word under cursor
 vim.keymap.set("n", "<leader>rw", [[:%s/<C-r><C-w>//g<Left><Left>]], { noremap = true, silent = true })
 
+-- inc-rename
+vim.keymap.set("n", "<leader>rn", function()
+	return ":IncRename " .. vim.fn.expand("<cword>")
+end, { expr = true })
+
 -- Buffer navigation
 vim.keymap.set("n", "<leader>,", ":bprevious<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>.", ":bnext<CR>", { noremap = true, silent = true })

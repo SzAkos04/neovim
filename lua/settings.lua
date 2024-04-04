@@ -31,7 +31,6 @@ vim.o.showtabline = 2
 vim.o.showcmd = false
 vim.o.ruler = false
 vim.o.spell = true
--- this is teh default value for this wow this is underlineing the wrong thign
 vim.o.spelllang = "en_us"
 vim.o.cmdheight = 1
 vim.o.shell = "/bin/zsh"
@@ -40,13 +39,24 @@ if vim.bo.filetype == "c" or vim.bo.filetype == "cpp" then
 end
 
 -- Set relative number in normal mode and no relative number in insert mode
-vim.cmd([[
-    augroup NumberToggle
-        autocmd!
-        autocmd InsertEnter * set norelativenumber
-        autocmd InsertLeave * set relativenumber
-    augroup END
-]])
+vim.api.nvim_create_autocmd("InsertEnter", {
+	pattern = "*",
+	callback = function()
+		vim.o.relativenumber = false
+	end,
+})
+vim.api.nvim_create_autocmd("InsertLeave", {
+	pattern = "*",
+	callback = function()
+		vim.o.relativenumber = true
+	end,
+})
+vim.api.nvim_create_autocmd("TermEnter", {
+	pattern = "*",
+	callback = function()
+		vim.o.number = false
+	end,
+})
 
 -- Disable auto comment on newline
 vim.cmd("autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o")
@@ -64,5 +74,12 @@ vim.api.nvim_create_autocmd("TermOpen", {
 	pattern = "*",
 	callback = function()
 		vim.wo.spell = false
+	end,
+})
+
+vim.api.nvim_create_autocmd("TermEnter", {
+	pattern = "term://*toggleterm#*",
+	callback = function()
+		vim.cmd(":file! Terminal")
 	end,
 })

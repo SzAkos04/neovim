@@ -77,6 +77,12 @@ return require("packer").startup(function(use)
 			require("mason-lspconfig").setup()
 		end,
 	})
+	use({
+		"smjonas/inc-rename.nvim",
+		config = function()
+			require("inc_rename").setup()
+		end,
+	})
 	-- Notifications
 	use({
 		"j-hui/fidget.nvim",
@@ -294,6 +300,7 @@ return require("packer").startup(function(use)
 				persist_size = false,
 				persist_mode = false,
 				direction = "vertical",
+				close_on_exit = true,
 			})
 		end,
 	})
