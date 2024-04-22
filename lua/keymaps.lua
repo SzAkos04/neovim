@@ -23,15 +23,18 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>rw", [[:%s/<C-r><C-w>//g<Left><Left>]], { noremap = true, silent = true })
 
 -- inc-rename
-vim.keymap.set("n", "<leader>rn", function()
-	return ":IncRename " .. vim.fn.expand("<cword>")
-end, { expr = true })
+-- vim.keymap.set("n", "<leader>rn", function()
+-- 	return ":IncRename " .. vim.fn.expand("<cword>")
+-- end, { expr = true })
+
+-- rename
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
 
 -- Buffer navigation
 vim.keymap.set("n", "<leader>,", ":bprevious<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>.", ":bnext<CR>", { noremap = true, silent = true })
 -- Close buffer
-vim.keymap.set("n", "<leader>c", ":bd<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>c", ':lua require("bufdelete").bufdelete(0)<CR>', { noremap = true, silent = true })
 
 -- cmp
 -- space space to hover
@@ -48,3 +51,10 @@ vim.keymap.set("n", "<leader>fc", ":Telescope git_commits<CR>", { noremap = true
 -- Terminal
 vim.keymap.set("n", "<leader>t", ":ToggleTerm<CR>", { noremap = true, silent = true })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+
+vim.keymap.set("n", "<leader>sw", function()
+	require("binary-swap").swap_operands()
+end)
+vim.keymap.set("n", "<leader>sv", function()
+	require("binary-swap").swap_operands_with_operator()
+end)

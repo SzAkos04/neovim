@@ -20,6 +20,7 @@ vim.o.wrap = false
 vim.o.clipboard = "unnamedplus"
 vim.o.t_Co = 256
 vim.o.mouse = "a"
+vim.o.mousemoveevent = true
 vim.o.termguicolors = true
 vim.o.swapfile = false
 vim.o.backup = false
@@ -31,6 +32,7 @@ vim.o.showtabline = 2
 vim.o.showcmd = false
 vim.o.ruler = false
 vim.o.spell = true
+vim.o.autochdir = false
 vim.o.spelllang = "en_us"
 vim.o.cmdheight = 1
 vim.o.shell = "/bin/zsh"
@@ -49,12 +51,6 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 	pattern = "*",
 	callback = function()
 		vim.o.relativenumber = true
-	end,
-})
-vim.api.nvim_create_autocmd("TermEnter", {
-	pattern = "*",
-	callback = function()
-		vim.o.number = false
 	end,
 })
 

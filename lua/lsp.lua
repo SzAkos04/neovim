@@ -58,6 +58,9 @@ nvim_lsp.lua_ls.setup({
 					[vim.fn.expand("$VIMRUNTIME/lua/vim/nvim_lsp")] = true,
 				},
 			},
+			completion = {
+				callSnippet = "Replace",
+			},
 		},
 	},
 })
@@ -96,6 +99,11 @@ nvim_lsp.zls.setup({
 
 -- TypeScript Language Server (tsserver) custom setup
 nvim_lsp.tsserver.setup({
+	on_attach = on_attach,
+})
+
+-- HTML Language Server (html-lsp) custom setup
+nvim_lsp.html.setup({
 	on_attach = on_attach,
 })
 

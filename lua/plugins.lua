@@ -2,6 +2,13 @@ vim.cmd("packadd packer.nvim")
 return require("packer").startup(function(use)
 	use("wbthomason/packer.nvim")
 
+	use({
+		"folke/neodev.nvim",
+		config = function()
+			require("neodev").setup()
+		end,
+	})
+
 	-- LSP
 	use({
 		"neovim/nvim-lspconfig",
@@ -11,26 +18,23 @@ return require("packer").startup(function(use)
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-vsnip",
+			"hrsh7th/vim-vsnip",
 			"onsails/lspkind.nvim",
+			"lukas-reineke/cmp-under-comparator",
 		},
 		config = function()
 			-- Set up nvim-cmp
 			require("cmp").setup({
 				snippet = {
 					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
+						vim.fn["vsnip#anonymous"](args.body)
 					end,
-				},
-				sources = {
-					{ name = "nvim_lsp", blacklist = { "Text" } },
-					{ name = "luasnip" },
 				},
 				mapping = {
 					["<C-p>"] = require("cmp").mapping.select_prev_item(),
 					["<C-n>"] = require("cmp").mapping.select_next_item(),
-					["<C-d>"] = require("cmp").mapping.scroll_docs(-4),
+					["<C-b>"] = require("cmp").mapping.scroll_docs(-4),
 					["<C-f>"] = require("cmp").mapping.scroll_docs(4),
 					["<C-Space>"] = require("cmp").mapping.complete(),
 					["<C-e>"] = require("cmp").mapping.close(),
@@ -38,6 +42,10 @@ return require("packer").startup(function(use)
 						behavior = require("cmp").ConfirmBehavior.Insert,
 						select = true,
 					}),
+				},
+				sources = {
+					{ name = "nvim_lsp", blacklist = { "Text" } },
+					{ name = "vsnip" },
 				},
 				completion = {
 					completeopt = "menu,menuone,noinsert",
@@ -54,6 +62,25 @@ return require("packer").startup(function(use)
 						return vim_item
 					end,
 				},
+				sorting = {
+					comparators = {
+						require("cmp").config.compare.offset,
+						require("cmp").config.compare.exact,
+						require("cmp").config.compare.score,
+						require("cmp-under-comparator").under,
+						require("cmp").config.compare.kind,
+						require("cmp").config.compare.sort_text,
+						require("cmp").config.compare.length,
+						require("cmp").config.compare.order,
+					},
+				},
+				require("cmp").setup.filetype("gitcommit", {
+					sources = require("cmp").config.sources({
+						{ name = "git" },
+					}, {
+						{ name = "buffer" },
+					}),
+				}),
 			})
 		end,
 	})
@@ -62,7 +89,7 @@ return require("packer").startup(function(use)
 		requires = { "saadparwaiz1/cmp_luasnip" },
 		config = function()
 			require("luasnip").setup({ update_events = { "TextChanged", "TextChangedI" } })
-			require("luasnip").config.set_config({ history = true })
+			require("luasnip").config.set_config({ history = true, updateevents = "TextChanged,TextChangedI" })
 			require("luasnip/loaders/from_vscode").load()
 		end,
 	})
@@ -78,9 +105,26 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
-		"smjonas/inc-rename.nvim",
+		"Wansmer/symbol-usage.nvim",
+		event = "BufReadPre",
 		config = function()
-			require("inc_rename").setup()
+			require("symbol-usage").setup()
+		end,
+	})
+	-- use({
+	-- 	"smjonas/inc-rename.nvim",
+	-- 	config = function()
+	-- 		require("inc_rename").setup()
+	-- 	end,
+	-- })
+	use({
+		"ray-x/lsp_signature.nvim",
+		config = function()
+			require("lsp_signature").setup({
+				debug = true,
+				hint_enable = false,
+				handler_opts = { border = "single" },
+			})
 		end,
 	})
 	-- Notifications
@@ -171,6 +215,12 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
+		"xiyaowong/transparent.nvim",
+		require("transparent").setup({
+			extra_groups = { "Pmenu", "PmenuSel" },
+		}),
+	})
+	use({
 		"daschw/leaf.nvim",
 		config = function()
 			require("leaf").setup({
@@ -181,13 +231,17 @@ return require("packer").startup(function(use)
 				statementStyle = "bold",
 				typeStyle = "NONE",
 				variablebuiltinStyle = "italic",
-				transparent = true,
+				transparent = vim.g.transparent_enabled,
 				colors = {},
-				overrides = {},
+				overrides = {
+					Normal = { bg = "none" },
+					FloatBorder = { bg = "none" },
+				},
 				theme = "auto", -- default, based on vim.o.background, alternatives: "light", "dark"
 				contrast = "high", -- default, alternatives: "medium", "high"
 			})
 			vim.cmd("colorscheme leaf")
+			vim.o.pumblend = true
 		end,
 	})
 	use({
@@ -266,6 +320,9 @@ return require("packer").startup(function(use)
 	-- Additional plugins
 	use({
 		"nvim-treesitter/nvim-treesitter",
+		requires = {
+			"windwp/nvim-ts-autotag",
+		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
 				-- A list of parser names, or "all" (the five listed parsers should always be installed)
@@ -281,6 +338,9 @@ return require("packer").startup(function(use)
 				highlight = { enable = true },
 				indent = { enable = false },
 				incremental_selection = { enable = false },
+				autotag = {
+					enable = true,
+				},
 			})
 		end,
 	})
@@ -350,7 +410,8 @@ return require("packer").startup(function(use)
 					clang_format = {
 						inherit = false,
 						command = "clang-format",
-						args = { "-style={BasedOnStyle: llvm, IndentWidth: 4}", "-i", "$FILENAME" },
+						args = { "-style=file", "-i", "$FILENAME" },
+						-- args = { "-i", "$FILENAME" },
 						stdin = false,
 					},
 					findent = {
@@ -381,5 +442,20 @@ return require("packer").startup(function(use)
 	})
 	use({
 		"ThePrimeagen/vim-be-good",
+	})
+	use({
+		"soulis-1256/eagle.nvim",
+		config = function()
+			require("eagle").setup()
+		end,
+	})
+	use({
+		"Wansmer/binary-swap.nvim",
+	})
+	use({
+		"famiu/bufdelete.nvim",
+	})
+	use({
+		"wakatime/vim-wakatime",
 	})
 end)
