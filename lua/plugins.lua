@@ -2,13 +2,6 @@ vim.cmd("packadd packer.nvim")
 return require("packer").startup(function(use)
 	use("wbthomason/packer.nvim")
 
-	use({
-		"folke/neodev.nvim",
-		config = function()
-			require("neodev").setup()
-		end,
-	})
-
 	-- LSP
 	use({
 		"neovim/nvim-lspconfig",
@@ -22,8 +15,25 @@ return require("packer").startup(function(use)
 			"hrsh7th/vim-vsnip",
 			"onsails/lspkind.nvim",
 			"lukas-reineke/cmp-under-comparator",
+
+			"hrsh7th/cmp-calc",
+
+			"windwp/nvim-autopairs",
 		},
+
 		config = function()
+			local custom_menu_icon = {
+				nvim_lsp = "",
+				vsnip = "",
+				calc = "󰃬",
+				-- buffer = "[Buf]",
+				-- path = "[Path]",
+				-- cmdline = "[CMD]",
+				-- git = "[Git]",
+			}
+			require("nvim-autopairs").setup({})
+			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
 			-- Set up nvim-cmp
 			require("cmp").setup({
 				snippet = {
@@ -46,19 +56,36 @@ return require("packer").startup(function(use)
 				sources = {
 					{ name = "nvim_lsp", blacklist = { "Text" } },
 					{ name = "vsnip" },
+					{ name = "calc" },
+					-- { name = "buffer" },
+					{ name = "path" },
+					{ name = "cmdline" },
+					{ name = "git" },
 				},
 				completion = {
 					completeopt = "menu,menuone,noinsert",
 				},
 				formatting = {
 					format = function(entry, vim_item)
-						vim_item.kind = require("lspkind").presets.default[vim_item.kind] .. " " .. vim_item.kind
+						-- Modify the kind icon based on source
+						if custom_menu_icon[entry.source.name] then
+							vim_item.kind = custom_menu_icon[entry.source.name] .. " " .. vim_item.kind
+						else
+							-- Use default icon if no custom icon is defined
+							vim_item.kind = require("lspkind").presets.default[vim_item.kind] .. " " .. vim_item.kind
+						end
+
+						-- Set menu text based on source
 						vim_item.menu = ({
 							nvim_lsp = "[LSP]",
+							vsnip = "[VSnip]",
+							calc = "[Calc]",
+							buffer = "[Buffer]",
 							path = "[Path]",
-							treesitter = "[Treesitter]",
-							luasnip = "[LuaSnip]",
+							cmdline = "[Cmdline]",
+							git = "[Git]",
 						})[entry.source.name]
+
 						return vim_item
 					end,
 				},
@@ -74,6 +101,13 @@ return require("packer").startup(function(use)
 						require("cmp").config.compare.order,
 					},
 				},
+				window = {
+					completion = {
+						winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+						col_offset = -3,
+						side_padding = 0,
+					},
+				},
 				require("cmp").setup.filetype("gitcommit", {
 					sources = require("cmp").config.sources({
 						{ name = "git" },
@@ -85,15 +119,6 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
-		"L3MON4D3/LuaSnip",
-		requires = { "saadparwaiz1/cmp_luasnip" },
-		config = function()
-			require("luasnip").setup({ update_events = { "TextChanged", "TextChangedI" } })
-			require("luasnip").config.set_config({ history = true, updateevents = "TextChanged,TextChangedI" })
-			require("luasnip/loaders/from_vscode").load()
-		end,
-	})
-	use({
 		"williamboman/mason.nvim",
 		requires = {
 			"williamboman/mason-lspconfig.nvim",
@@ -102,29 +127,6 @@ return require("packer").startup(function(use)
 		config = function()
 			require("mason").setup()
 			require("mason-lspconfig").setup()
-		end,
-	})
-	use({
-		"Wansmer/symbol-usage.nvim",
-		event = "BufReadPre",
-		config = function()
-			require("symbol-usage").setup()
-		end,
-	})
-	-- use({
-	-- 	"smjonas/inc-rename.nvim",
-	-- 	config = function()
-	-- 		require("inc_rename").setup()
-	-- 	end,
-	-- })
-	use({
-		"ray-x/lsp_signature.nvim",
-		config = function()
-			require("lsp_signature").setup({
-				debug = true,
-				hint_enable = false,
-				handler_opts = { border = "single" },
-			})
 		end,
 	})
 	-- Notifications
@@ -206,12 +208,6 @@ return require("packer").startup(function(use)
 				fg = "#ffffff",
 				exclude_fts = { "Veil", "Packer" },
 			})
-		end,
-	})
-	use({
-		"windwp/nvim-autopairs",
-		config = function()
-			require("nvim-autopairs").setup({})
 		end,
 	})
 	use({
@@ -322,6 +318,7 @@ return require("packer").startup(function(use)
 		"nvim-treesitter/nvim-treesitter",
 		requires = {
 			"windwp/nvim-ts-autotag",
+			"andymass/vim-matchup",
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
@@ -338,10 +335,9 @@ return require("packer").startup(function(use)
 				highlight = { enable = true },
 				indent = { enable = false },
 				incremental_selection = { enable = false },
-				autotag = {
-					enable = true,
-				},
 			})
+			require("nvim-ts-autotag").setup()
+			vim.g.matchup_matchparen_offscreen = { method = "popup" }
 		end,
 	})
 	use({
@@ -364,15 +360,8 @@ return require("packer").startup(function(use)
 			})
 		end,
 	})
-	-- use({
-	-- 	"github/copilot.vim",
-	-- })
-	use({
-		"tpope/vim-fugitive",
-	})
-	use({
-		"tpope/vim-commentary",
-	})
+	use({ "tpope/vim-fugitive" })
+	use({ "tpope/vim-commentary" })
 	use({
 		"simrat39/rust-tools.nvim",
 		config = function()
@@ -392,14 +381,9 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
-		"Saecki/crates.nvim",
-	})
-	use({
 		"p00f/clangd_extensions.nvim",
 		config = function()
 			require("clangd_extensions").setup()
-			require("clangd_extensions.inlay_hints").setup_autocmd()
-			require("clangd_extensions.inlay_hints").set_inlay_hints()
 		end,
 	})
 	use({
@@ -440,22 +424,15 @@ return require("packer").startup(function(use)
 			require("marks").setup()
 		end,
 	})
-	use({
-		"ThePrimeagen/vim-be-good",
-	})
+	use({ "ThePrimeagen/vim-be-good" })
 	use({
 		"soulis-1256/eagle.nvim",
 		config = function()
 			require("eagle").setup()
 		end,
 	})
-	use({
-		"Wansmer/binary-swap.nvim",
-	})
-	use({
-		"famiu/bufdelete.nvim",
-	})
-	use({
-		"wakatime/vim-wakatime",
-	})
+	use({ "Wansmer/binary-swap.nvim" })
+	use({ "famiu/bufdelete.nvim" })
+	use({ "wakatime/vim-wakatime" })
+	use({ "Saecki/crates.nvim" })
 end)
