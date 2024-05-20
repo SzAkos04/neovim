@@ -121,3 +121,8 @@ nvim_lsp.bashls.setup({
 nvim_lsp.fortls.setup({
 	root_dir = nvim_lsp.util.root_pattern(".git", "Makefile"),
 })
+
+-- Assembly Language Server (asm_lsp) custom setup
+nvim_lsp.asm_lsp.setup({
+	on_attach = on_attach,
+})

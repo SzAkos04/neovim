@@ -59,7 +59,6 @@ return require("packer").startup(function(use)
 					{ name = "calc" },
 					-- { name = "buffer" },
 					{ name = "path" },
-					{ name = "cmdline" },
 					{ name = "git" },
 				},
 				completion = {
@@ -82,7 +81,6 @@ return require("packer").startup(function(use)
 							calc = "[Calc]",
 							buffer = "[Buffer]",
 							path = "[Path]",
-							cmdline = "[Cmdline]",
 							git = "[Git]",
 						})[entry.source.name]
 
@@ -237,7 +235,6 @@ return require("packer").startup(function(use)
 				contrast = "high", -- default, alternatives: "medium", "high"
 			})
 			vim.cmd("colorscheme leaf")
-			vim.o.pumblend = true
 		end,
 	})
 	use({
@@ -394,8 +391,8 @@ return require("packer").startup(function(use)
 					clang_format = {
 						inherit = false,
 						command = "clang-format",
-						args = { "-style=file", "-i", "$FILENAME" },
-						-- args = { "-i", "$FILENAME" },
+						-- args = { "-style=file", "-i", "$FILENAME" },
+						args = { "-style={BasedOnStyle: llvm, IndentWidth: 4}", "-i", "$FILENAME" },
 						stdin = false,
 					},
 					findent = {
@@ -408,6 +405,7 @@ return require("packer").startup(function(use)
 				formatters_by_ft = {
 					c = { "clang_format" },
 					cpp = { "clang_format" },
+					asm = { "asmfmt" },
 					go = { "gofmt" },
 					javascript = { "prettier" },
 					lua = { "stylua" },
@@ -434,5 +432,10 @@ return require("packer").startup(function(use)
 	use({ "Wansmer/binary-swap.nvim" })
 	use({ "famiu/bufdelete.nvim" })
 	use({ "wakatime/vim-wakatime" })
-	use({ "Saecki/crates.nvim" })
+	use({
+		"Saecki/crates.nvim",
+		config = function()
+			require("crates").setup()
+		end,
+	})
 end)

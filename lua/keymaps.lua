@@ -22,14 +22,6 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 -- Replace word under cursor
 vim.keymap.set("n", "<leader>rw", [[:%s/<C-r><C-w>//g<Left><Left>]], { noremap = true, silent = true })
 
--- inc-rename
--- vim.keymap.set("n", "<leader>rn", function()
--- 	return ":IncRename " .. vim.fn.expand("<cword>")
--- end, { expr = true })
-
--- rename
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
-
 -- Buffer navigation
 vim.keymap.set("n", "<leader>,", ":bprevious<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>.", ":bnext<CR>", { noremap = true, silent = true })
@@ -52,9 +44,33 @@ vim.keymap.set("n", "<leader>fc", ":Telescope git_commits<CR>", { noremap = true
 vim.keymap.set("n", "<leader>t", ":ToggleTerm<CR>", { noremap = true, silent = true })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
 
-vim.keymap.set("n", "<leader>sw", function()
-	require("binary-swap").swap_operands()
+-- Crates
+vim.keymap.set("n", "<leader>rcu", function()
+	require("crates").upgrade_all_crates()
 end)
-vim.keymap.set("n", "<leader>sv", function()
-	require("binary-swap").swap_operands_with_operator()
-end)
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(event)
+		local opts = { buffer = event.buf }
+
+		vim.keymap.set("n", "<leader>gh", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+		vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+		vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+		vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+		vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+		vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+		vim.keymap.set("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+		vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+		vim.keymap.set({ "n", "x" }, "<S-f>", "<cmd>lua vim.lsp.buf.format({async = true})<CR>", opts)
+		vim.keymap.set("n", "gc", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+		vim.keymap.set("n", "<leader>lh", function()
+			vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+		end, { silent = true })
+		vim.keymap.set("n", "<leader>sw", function()
+			require("binary-swap").swap_operands()
+		end)
+		vim.keymap.set("n", "<leader>sv", function()
+			require("binary-swap").swap_operands_with_operator()
+		end)
+	end,
+})

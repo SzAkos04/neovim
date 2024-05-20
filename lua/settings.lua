@@ -18,7 +18,6 @@ vim.o.expandtab = true
 vim.o.shiftround = true
 vim.o.wrap = false
 vim.o.clipboard = "unnamedplus"
-vim.o.t_Co = 256
 vim.o.mouse = "a"
 vim.o.mousemoveevent = true
 vim.o.termguicolors = true
