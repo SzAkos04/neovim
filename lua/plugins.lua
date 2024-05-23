@@ -209,12 +209,6 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
-		"xiyaowong/transparent.nvim",
-		require("transparent").setup({
-			extra_groups = { "Pmenu", "PmenuSel" },
-		}),
-	})
-	use({
 		"daschw/leaf.nvim",
 		config = function()
 			require("leaf").setup({
@@ -225,7 +219,7 @@ return require("packer").startup(function(use)
 				statementStyle = "bold",
 				typeStyle = "NONE",
 				variablebuiltinStyle = "italic",
-				transparent = vim.g.transparent_enabled,
+				transparent = true,
 				colors = {},
 				overrides = {
 					Normal = { bg = "none" },

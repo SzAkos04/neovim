@@ -6,44 +6,41 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "󰌵", texthl = "DiagnosticSi
 
 -- Configure Neovim LSP to show errors underlined
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-  underline = true,
-  virtual_text = true,
-  signs = true,
-  update_in_insert = true,
-  severity_sort = true,
+    underline = true,
+    virtual_text = true,
+    signs = true,
+    update_in_insert = true,
+    severity_sort = true,
 })
 
 -- Set up lspconfig.
 local nvim_lsp = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-local on_attach = function(client)
-  require("completion").on_attach(client)
-end
 
 local servers = {
-  "html",
-  "tsserver",
-  "bashls",
-  "clangd",
-  "rust_analyzer",
-  "gopls",
-  "pylsp",
-  "zls",
-  "jdtls",
-  "fortls",
-  "asm_lsp",
+    "asm_lsp",
+    "bashls",
+    "clangd",
+    "fortls",
+    "gopls",
+    "html",
+    "jdtls",
+    "lua_ls",
+    "pylsp",
+    "rust_analyzer",
+    "tsserver",
+    "zls",
 }
 
 for _, server in pairs(servers) do
-  local opts = {
-    capabilities = capabilities,
-    on_attach = on_attach,
-  }
+    local opts = {
+        capabilities = capabilities,
+    }
 
-  local require_ok, conf_opts = pcall(require, "lsp-settings." .. server)
-  if require_ok then
-    opts = vim.tbl_deep_extend("force", conf_opts, opts)
-  end
+    local require_ok, conf_opts = pcall(require, "lsp-settings." .. server)
+    if require_ok then
+        opts = vim.tbl_deep_extend("force", conf_opts, opts)
+    end
 
-  nvim_lsp[server].setup(opts)
+    nvim_lsp[server].setup(opts)
 end
