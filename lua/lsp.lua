@@ -21,14 +21,10 @@ local servers = {
     "asm_lsp",
     "bashls",
     "clangd",
-    "fortls",
     "gopls",
-    "html",
-    "jdtls",
     "lua_ls",
     "pylsp",
     "rust_analyzer",
-    "tsserver",
     "zls",
 }
 
